@@ -1,0 +1,401 @@
+-- CSC 4480 Final Project - Spring 2026
+-- Group #8: Student Gradebook Database
+
+SELECT 'DROP EXISTING TABLES' FROM DUAL;
+
+DROP TABLE SUBMISSION CASCADE CONSTRAINTS;
+DROP TABLE GRADE CASCADE CONSTRAINTS;
+DROP TABLE ASSIGNMENT CASCADE CONSTRAINTS;
+DROP TABLE GRADE_CATEGORY CASCADE CONSTRAINTS;
+DROP TABLE ENROLLMENT CASCADE CONSTRAINTS;
+DROP TABLE COURSE CASCADE CONSTRAINTS;
+DROP TABLE PROFESSOR CASCADE CONSTRAINTS;
+DROP TABLE DEPARTMENT CASCADE CONSTRAINTS;
+DROP TABLE STUDENT CASCADE CONSTRAINTS;
+
+
+SELECT 'CREATE TABLES' FROM DUAL;
+
+CREATE TABLE DEPARTMENT (
+    department_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    department_name VARCHAR(30)
+);
+
+CREATE TABLE PROFESSOR (
+    professor_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    department_id VARCHAR(8),
+    first_name VARCHAR(20),
+    last_name VARCHAR(30),
+    email VARCHAR(50),
+    FOREIGN KEY (department_id) REFERENCES DEPARTMENT (department_id)
+);
+
+CREATE TABLE STUDENT (
+    student_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    first_name VARCHAR(20),
+    last_name VARCHAR(30),
+    email VARCHAR(50) UNIQUE
+);
+
+CREATE TABLE COURSE (
+    course_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    professor_id VARCHAR(8),
+    department_id VARCHAR(8),
+    course_no VARCHAR(7),
+    course_name VARCHAR(50),
+    semester VARCHAR(10),
+    year VARCHAR(4),
+    FOREIGN KEY (professor_id) REFERENCES PROFESSOR (professor_id),
+    FOREIGN KEY (department_id) REFERENCES DEPARTMENT (department_id)
+);
+
+CREATE TABLE ENROLLMENT (
+    enrollment_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    student_id VARCHAR(8),
+    course_id VARCHAR(8),
+    FOREIGN KEY (student_id) REFERENCES STUDENT (student_id),
+    FOREIGN KEY (course_id) REFERENCES COURSE (course_id)
+);
+
+CREATE TABLE GRADE_CATEGORY (
+    category_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    course_id VARCHAR(8),
+    category_name VARCHAR(30),
+    weight_percent DECIMAL(5,2),
+    FOREIGN KEY (course_id) REFERENCES COURSE (course_id)
+);
+
+CREATE TABLE ASSIGNMENT (
+    assignment_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    category_id VARCHAR(8),
+    title VARCHAR(50),
+    max_points DECIMAL(6,2),
+    due_date DATE,
+    FOREIGN KEY (category_id) REFERENCES GRADE_CATEGORY (category_id)
+);
+
+CREATE TABLE SUBMISSION (
+    submission_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    assignment_id VARCHAR(8),
+    student_id VARCHAR(8),
+    submitted_at DATE,
+    FOREIGN KEY (assignment_id) REFERENCES ASSIGNMENT (assignment_id),
+    FOREIGN KEY (student_id) REFERENCES STUDENT (student_id)
+);
+
+CREATE TABLE GRADE (
+    grade_id VARCHAR(8) NOT NULL PRIMARY KEY,
+    submission_id VARCHAR(8),
+    points_earned DECIMAL(6,2),
+    FOREIGN KEY (submission_id) REFERENCES SUBMISSION (submission_id)
+);
+
+
+SELECT 'INSERT DATA' FROM DUAL;
+
+
+SELECT 'Department' FROM DUAL;
+
+INSERT INTO DEPARTMENT (department_id, department_name)
+VALUES ('DEPT0001', 'Finance');
+
+SELECT 'Professor' FROM DUAL;
+
+INSERT INTO PROFESSOR (professor_id, department_id, first_name, last_name, email)
+VALUES ('PROF0001', 'DEPT0001', 'Warren', 'Buffett', 'wbuffett@villanova.edu');
+
+SELECT 'Students' FROM DUAL;
+
+INSERT INTO STUDENT (student_id, first_name, last_name, email)
+VALUES ('02481234', 'Theo', 'Musilli', 'tmusilli@villanova.edu');
+
+INSERT INTO STUDENT (student_id, first_name, last_name, email)
+VALUES ('02493429', 'Liz', 'Bossert', 'lbossert@villanova.edu');
+
+INSERT INTO STUDENT (student_id, first_name, last_name, email)
+VALUES ('02476851', 'Reena', 'Sariya', 'rsariya@villanova.edu');
+
+INSERT INTO STUDENT (student_id, first_name, last_name, email)
+VALUES ('02512937', 'Dave', 'Ramsey', 'dramsey@villanova.edu');
+
+INSERT INTO STUDENT (student_id, first_name, last_name, email)
+VALUES ('02468315', 'Charles', 'Payne', 'cpayne@villanova.edu');
+
+SELECT 'Courses' FROM DUAL;
+
+INSERT INTO COURSE (course_id, professor_id, department_id, course_no, course_name, semester, year)
+VALUES ('02110001', 'PROF0001', 'DEPT0001', 'FIN2010', 'Principles of Finance', 'Spring', '2026');
+
+INSERT INTO COURSE (course_id, professor_id, department_id, course_no, course_name, semester, year)
+VALUES ('02110002', 'PROF0001', 'DEPT0001', 'FIN3850', 'Portfolio Management', 'Spring', '2026');
+
+INSERT INTO COURSE (course_id, professor_id, department_id, course_no, course_name, semester, year)
+VALUES ('02110003', 'PROF0001', 'DEPT0001', 'FIN4350', 'Financial Derivatives', 'Spring', '2026');
+
+SELECT 'Enrollments' FROM DUAL;
+
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000001', '02481234', '02110001');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000002', '02493429', '02110001');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000003', '02476851', '02110001');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000004', '02512937', '02110001');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000005', '02468315', '02110001');
+
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000006', '02481234', '02110002');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000007', '02493429', '02110002');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000008', '02476851', '02110002');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000009', '02512937', '02110002');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000010', '02468315', '02110002');
+
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000011', '02481234', '02110003');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000012', '02493429', '02110003');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000013', '02476851', '02110003');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000014', '02512937', '02110003');
+INSERT INTO ENROLLMENT (enrollment_id, student_id, course_id) VALUES ('EN000015', '02468315', '02110003');
+
+SELECT 'Grade Categories' FROM DUAL;
+
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000001', '02110001', 'Homework', 20);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000002', '02110001', 'Case Studies', 25);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000003', '02110001', 'Midterm', 25);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000004', '02110001', 'Final Exam', 30);
+
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000005', '02110002', 'Homework', 20);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000006', '02110002', 'Quizzes', 20);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000007', '02110002', 'Midterm', 30);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000008', '02110002', 'Final Exam', 30);
+
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000009', '02110003', 'Homework', 15);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000010', '02110003', 'Case Studies', 25);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000011', '02110003', 'Midterm', 30);
+INSERT INTO GRADE_CATEGORY (category_id, course_id, category_name, weight_percent)
+VALUES ('GC000012', '02110003', 'Final Exam', 30);
+
+SELECT 'Assignments: Principles of Finance' FROM DUAL;
+
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000001', 'GC000001', 'HW1 - Time Value of Money', 100, TO_DATE('2026-01-28', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000002', 'GC000001', 'HW2 - Risk and Return', 100, TO_DATE('2026-02-11', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000003', 'GC000001', 'HW3 - Cost of Capital', 100, TO_DATE('2026-03-04', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000004', 'GC000002', 'Case Study 1 - Capital Budgeting', 100, TO_DATE('2026-02-18', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000005', 'GC000002', 'Case Study 2 - Stock Valuation', 100, TO_DATE('2026-03-18', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000006', 'GC000003', 'Midterm Exam', 100, TO_DATE('2026-03-11', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000007', 'GC000004', 'Final Exam', 100, TO_DATE('2026-04-28', 'YYYY-MM-DD'));
+
+SELECT 'Assignments: Portfolio Management' FROM DUAL;
+
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000008', 'GC000005', 'HW1 - Asset Allocation', 100, TO_DATE('2026-01-30', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000009', 'GC000005', 'HW2 - Portfolio Diversification', 100, TO_DATE('2026-02-20', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000010', 'GC000005', 'HW3 - CAPM Analysis', 100, TO_DATE('2026-03-20', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000011', 'GC000006', 'Quiz 1 - Modern Portfolio Theory', 50, TO_DATE('2026-02-06', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000012', 'GC000006', 'Quiz 2 - Efficient Frontier', 50, TO_DATE('2026-03-06', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000013', 'GC000007', 'Midterm Exam', 100, TO_DATE('2026-03-13', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000014', 'GC000008', 'Final Exam', 100, TO_DATE('2026-04-29', 'YYYY-MM-DD'));
+
+SELECT 'Assignments: Financial Derivatives' FROM DUAL;
+
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000015', 'GC000009', 'HW1 - Options Pricing', 100, TO_DATE('2026-02-02', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000016', 'GC000009', 'HW2 - Futures and Forwards', 100, TO_DATE('2026-03-02', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000017', 'GC000010', 'Case Study 1 - Hedging Strategies', 100, TO_DATE('2026-02-23', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000018', 'GC000010', 'Case Study 2 - Black-Scholes Model', 100, TO_DATE('2026-03-30', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000019', 'GC000011', 'Midterm Exam', 100, TO_DATE('2026-03-16', 'YYYY-MM-DD'));
+INSERT INTO ASSIGNMENT (assignment_id, category_id, title, max_points, due_date)
+VALUES ('AS000020', 'GC000012', 'Final Exam', 100, TO_DATE('2026-04-27', 'YYYY-MM-DD'));
+
+SELECT 'Submissions' FROM DUAL;
+
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000001', 'AS000001', '02481234', TO_DATE('2026-01-27', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000002', 'AS000001', '02493429', TO_DATE('2026-01-28', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000003', 'AS000001', '02476851', TO_DATE('2026-01-28', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000004', 'AS000001', '02512937', TO_DATE('2026-01-27', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000005', 'AS000001', '02468315', TO_DATE('2026-01-28', 'YYYY-MM-DD'));
+
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000006', 'AS000006', '02481234', TO_DATE('2026-03-11', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000007', 'AS000006', '02493429', TO_DATE('2026-03-11', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000008', 'AS000006', '02476851', TO_DATE('2026-03-11', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000009', 'AS000006', '02512937', TO_DATE('2026-03-11', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000010', 'AS000006', '02468315', TO_DATE('2026-03-11', 'YYYY-MM-DD'));
+
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000011', 'AS000013', '02481234', TO_DATE('2026-03-13', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000012', 'AS000013', '02493429', TO_DATE('2026-03-13', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000013', 'AS000013', '02476851', TO_DATE('2026-03-13', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000014', 'AS000013', '02512937', TO_DATE('2026-03-13', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000015', 'AS000013', '02468315', TO_DATE('2026-03-13', 'YYYY-MM-DD'));
+
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000016', 'AS000019', '02481234', TO_DATE('2026-03-16', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000017', 'AS000019', '02493429', TO_DATE('2026-03-16', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000018', 'AS000019', '02476851', TO_DATE('2026-03-16', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000019', 'AS000019', '02512937', TO_DATE('2026-03-16', 'YYYY-MM-DD'));
+INSERT INTO SUBMISSION (submission_id, assignment_id, student_id, submitted_at)
+VALUES ('SB000020', 'AS000019', '02468315', TO_DATE('2026-03-16', 'YYYY-MM-DD'));
+
+SELECT 'Grades' FROM DUAL;
+
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000001', 'SB000001', 88);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000002', 'SB000002', 92);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000003', 'SB000003', 75);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000004', 'SB000004', 95);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000005', 'SB000005', 82);
+
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000006', 'SB000006', 84);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000007', 'SB000007', 91);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000008', 'SB000008', 70);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000009', 'SB000009', 88);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000010', 'SB000010', 77);
+
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000011', 'SB000011', 90);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000012', 'SB000012', 85);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000013', 'SB000013', 78);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000014', 'SB000014', 93);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000015', 'SB000015', 67);
+
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000016', 'SB000016', 79);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000017', 'SB000017', 94);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000018', 'SB000018', 83);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000019', 'SB000019', 71);
+INSERT INTO GRADE (grade_id, submission_id, points_earned)
+VALUES ('GR000020', 'SB000020', 88);
+
+
+
+SELECT 'QUERIES' FROM DUAL;
+
+
+SELECT 'View All Tables' FROM DUAL;
+SELECT * FROM DEPARTMENT;
+SELECT * FROM PROFESSOR;
+SELECT * FROM STUDENT;
+SELECT * FROM COURSE;
+SELECT * FROM ENROLLMENT;
+SELECT * FROM GRADE_CATEGORY;
+SELECT * FROM ASSIGNMENT;
+SELECT * FROM SUBMISSION;
+SELECT * FROM GRADE;
+
+SELECT '3 Courses Taught by Professor Buffet' FROM DUAL;
+
+SELECT C.course_name, C.course_no, C.semester, C.year
+FROM COURSE C, PROFESSOR P
+WHERE C.professor_id = P.professor_id
+AND UPPER(P.last_name) = UPPER('Buffett');
+
+SELECT 'Students Enrolled in Principles of Finance' FROM DUAL;
+
+SELECT S.student_id, S.first_name, S.last_name, S.email
+FROM STUDENT S, ENROLLMENT E, COURSE C
+WHERE S.student_id = E.student_id
+AND E.course_id = C.course_id
+AND UPPER(C.course_name) = UPPER('Principles of Finance');
+
+
+SELECT 'Student Count Per Course' FROM DUAL;
+
+SELECT C.course_name, COUNT(E.student_id)
+FROM COURSE C, ENROLLMENT E
+WHERE C.course_id = E.course_id
+GROUP BY C.course_name
+ORDER BY COUNT(E.student_id) DESC;
+
+SELECT 'Grade Category Weight Totals Per Course' FROM DUAL;
+
+SELECT C.course_name, SUM(GC.weight_percent)
+FROM GRADE_CATEGORY GC, COURSE C
+WHERE GC.course_id = C.course_id
+GROUP BY C.course_name
+ORDER BY C.course_name ASC;
+
+SELECT 'Assignments Due After March 15 2026' FROM DUAL;
+
+SELECT A.title, A.due_date, GC.category_name, C.course_name
+FROM ASSIGNMENT A, GRADE_CATEGORY GC, COURSE C
+WHERE A.category_id = GC.category_id
+AND GC.course_id = C.course_id
+AND A.due_date > TO_DATE('2026-03-15', 'YYYY-MM-DD')
+ORDER BY A.due_date ASC;
+
+SELECT 'Student Lookup by Last Name: Sariya' FROM DUAL;
+
+SELECT * FROM STUDENT
+WHERE UPPER(last_name) = UPPER('Sariya');
+
+
+
+SELECT 'UPDATES' FROM DUAL;
+
+SELECT 'Update Grade for Theo Musilli on HW1' FROM DUAL;
+
+UPDATE GRADE
+SET points_earned = 91
+WHERE submission_id = 'SB000001';
+
+SELECT G.grade_id, G.points_earned, SB.submission_id, SB.student_id
+FROM GRADE G, SUBMISSION SB
+WHERE G.submission_id = SB.submission_id
+AND SB.student_id = '02481234'
+AND SB.assignment_id = 'AS000001';
